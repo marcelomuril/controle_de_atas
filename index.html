@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Atas de Reunião</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #secao-impressao, #secao-impressao * { visibility: visible; }
+      #secao-impressao {
+        position: absolute; left: 0; top: 0; width: 100%;
+      }
+      @page { margin: 1in; }
+    }
+    .no-print { display: block; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-3xl">
+    <!-- Cabeçalho -->
+    <header class="text-center mb-8 no-print">
+      <h1 class="text-3xl font-bold text-gray-900">Gerador de Atas de Reunião</h1>
+      <p class="text-gray-600 mt-2">Preencha os campos abaixo para gerar sua ata de forma rápida e organizada.</p>
+    </header>
+
+    <!-- Formulário em blocos verticais -->
+    <div class="space-y-6 no-print">
+
+      <!-- Dados Gerais -->
+      <div class="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">1. Dados Gerais da Reunião</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="numero" class="block text-sm font-medium text-gray-700">Número da Ata</label>
+            <input type="number" id="numero" value="1" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          </div>
+          <div>
+            <label for="titulo" class="block text-sm font-medium text-gray-700">Assunto da Reunião</label>
+            <input type="text" id="titulo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          </div>
+          <div>
+            <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
+            <input type="date" id="data" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          </div>
+          <div>
+            <label for="local" class="block text-sm font-medium text-gray-700">Local</label>
+            <input type="text" id="local" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- Participantes -->
+      <div class="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">2. Participantes</h2>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="input-participante" class="flex-grow block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Nome do participante">
+          <button id="btn-add-participante" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">Adicionar</button>
+        </div>
+        <ul id="lista-participantes" class="mt-4 space-y-2"></ul>
+      </div>
+
+      <!-- Pauta -->
+      <div class="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">3. Pauta da Reunião</h2>
+        <div class="flex items-center space-x-2">
+          <input type="text" id="input-pauta" class="flex-grow block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Tópico da pauta">
+          <button id="btn-add-pauta" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">Adicionar</button>
+        </div>
+        <ul id="lista-pautas" class="mt-4 space-y-2 list-decimal list-inside"></ul>
+      </div>
+
+      <!-- Deliberações -->
+      <div class="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">4. Deliberações e Redator</h2>
+        <div class="mb-4">
+          <label for="redator" class="block text-sm font-medium text-gray-700">Nome do(a) Redator(a)</label>
+          <input type="text" id="redator" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+        </div>
+        <div>
+          <label for="deliberacoes" class="block text-sm font-medium text-gray-700">Deliberações e Decisões</label>
+          <textarea id="deliberacoes" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botão -->
+    <div class="mt-8 text-center no-print">
+      <button id="btn-gerar-ata" class="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700">
+        Gerar Ata para Impressão
+      </button>
+    </div>
+
+    <!-- Pré-visualização -->
+    <div id="secao-impressao" class="bg-white p-8 md:p-12 mt-8 rounded-lg shadow-md border border-gray-200">
+      <div id="preview-cabecalho" class="flex items-start mb-8 border-b pb-4">
+        <img id="logo" src="https://i.imgur.com/msft1gP.png" alt="[Logo]" class="w-24 h-24 mr-6">
+        <div class="text-center flex-grow">
+          <p class="font-bold text-sm sm:text-base">COLÉGIO ESTADUAL CÍVICO-MILITAR SEBASTIÃO PARANÁ – E.F.M.</p>
+          <p class="text-xs sm:text-sm">RUA BENJAMIN CONSTANT, 886 – CENTRO – PALMAS PR</p>
+          <p class="text-xs sm:text-sm">EMAIL: plmsebastiaoparana@seed.pr.gov.br</p>
+          <p class="text-xs sm:text-sm">FONE: (46) 3262-1647</p>
+        </div>
+      </div>
+      <h1 id="preview-titulo" class="text-2xl font-bold text-center mb-2">Ata de Reunião</h1>
+      <h2 id="preview-subtitulo" class="text-xl font-semibold text-center mb-8"></h2>
+      <div class="space-y-6 text-base">
+        <p>Aos <b id="preview-data">DD de Mês de AAAA</b>, reuniram-se nas dependências de <b id="preview-local"></b>, os seguintes membros:</p>
+        <ul id="preview-participantes" class="list-disc list-inside ml-4"><li>(Nenhum participante adicionado)</li></ul>
+        <p>A reunião teve como pauta os seguintes tópicos:</p>
+        <ol id="preview-pautas" class="list-decimal list-inside ml-4"><li>(Nenhuma pauta adicionada)</li></ol>
+        <h3 class="text-lg font-semibold pt-4 border-t mt-6">Deliberações:</h3>
+        <p id="preview-deliberacoes" class="whitespace-pre-wrap">(Nenhuma deliberação inserida)</p>
+        <p class="mt-8">Nada mais havendo a tratar, a reunião foi encerrada. Eu, <b id="preview-redator">____________________________________</b>, lavrei a presente ata.</p>
+        <div class="mt-16 pt-8">
+          <h3 class="text-lg font-semibold mb-8 text-center">Assinaturas</h3>
+          <div id="preview-assinaturas" class="space-y-12"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiURL = "https://script.google.com/a/macros/escola.pr.gov.br/s/AKfycbypYFcmTw7-3A-JI2rICon0Jgmr9KhZnK44Sll6NI9LHvCBBNUQ4zlU68jeiS83K7OMfQ/exec";
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      const tituloInput = document.getElementById('titulo');
+      const numeroInput = document.getElementById('numero');
+      const dataInput = document.getElementById('data');
+      const localInput = document.getElementById('local');
+      const deliberacoesInput = document.getElementById('deliberacoes');
+      const redatorInput = document.getElementById('redator');
+      const participanteInput = document.getElementById('input-participante');
+      const addParticipanteBtn = document.getElementById('btn-add-participante');
+      const participantesLista = document.getElementById('lista-participantes');
+      const pautaInput = document.getElementById('input-pauta');
+      const addPautaBtn = document.getElementById('btn-add-pauta');
+      const pautasLista = document.getElementById('lista-pautas');
+      const gerarAtaBtn = document.getElementById('btn-gerar-ata');
+      const previewSubtitulo = document.getElementById('preview-subtitulo');
+      const previewData = document.getElementById('preview-data');
+      const previewLocal = document.getElementById('preview-local');
+      const previewParticipantes = document.getElementById('preview-participantes');
+      const previewPautas = document.getElementById('preview-pautas');
+      const previewDeliberacoes = document.getElementById('preview-deliberacoes');
+      const previewAssinaturas = document.getElementById('preview-assinaturas');
+      const previewRedator = document.getElementById('preview-redator');
+
+      const hoje = new Date();
+      const hojeFormatado = hoje.getFullYear() + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + ('0' + hoje.getDate()).slice(-2);
+      dataInput.value = hojeFormatado;
+
+      try {
+        const res = await fetch(apiURL);
+        const dados = await res.json();
+        numeroInput.value = dados.numero;
+      } catch (err) {
+        console.error("Erro ao buscar número da ata:", err);
+      }
+
+      atualizarPreview();
+
+      function adicionarItem(input, lista) {
+        const texto = input.value.trim();
+        if (texto === '') return;
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between bg-gray-50 p-2 rounded-md border';
+        const span = document.createElement('span');
+        span.textContent = texto;
+        li.appendChild(span);
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remover';
+        removeBtn.className = 'text-red-500 hover:text-red-700 text-xs font-semibold';
+        removeBtn.onclick = function() { li.remove(); atualizarPreview(); };
+        li.appendChild(removeBtn);
+        lista.appendChild(li);
+        input.value = '';
+        input.focus();
+        atualizarPreview();
+      }
+
+      function atualizarPreview() {
+        previewSubtitulo.textContent = `Ata Nº ${numeroInput.value} - ${tituloInput.value || '(Assunto não definido)'}`;
+        const dataSelecionada = new Date(dataInput.value + 'T12:00:00');
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        previewData.textContent = dataSelecionada.toLocaleDateString('pt-BR', options);
+        previewLocal.textContent = localInput.value || '(local não definido)';
+        previewDeliberacoes.textContent = deliberacoesInput.value || '(Nenhuma deliberação inserida)';
+        previewRedator.textContent = redatorInput.value.trim() || '____________________________________';
+        atualizarListaPreview(participantesLista, previewParticipantes, '(Nenhum participante adicionado)');
+        gerarAssinaturas();
+        atualizarListaPreview(pautasLista, previewPautas, '(Nenhuma pauta adicionada)');
+      }
+
+      function atualizarListaPreview(listaOrigem, listaDestino, textoVazio) {
+        listaDestino.innerHTML = '';
+        const itens = listaOrigem.querySelectorAll('li span');
+        if (itens.length === 0) {
+          listaDestino.innerHTML = `<li>${textoVazio}</li>`;
+        } else {
+          itens.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item.textContent;
+            listaDestino.appendChild(li);
+          });
+        }
+      }
+
+      function gerarAssinaturas() {
+        previewAssinaturas.innerHTML = '';
+        const itens = participantesLista.querySelectorAll('li span');
+        if (itens.length === 0) {
+          const div = document.createElement('div');
+          div.className = "text-center text-gray-500";
+          div.textContent = "(Nenhum participante para assinar)";
+          previewAssinaturas.appendChild(div);
+        } else {
+          itens.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "text-center";
+            div.innerHTML = `<p class="border-t border-gray-400 pt-2 mx-auto w-64"></p><p class="text-sm">${item.textContent}</p>`;
+            previewAssinaturas.appendChild(div);
+          });
+        }
+      }
+
+      addParticipanteBtn.addEventListener('click', () => adicionarItem(participanteInput, participantesLista));
+      participanteInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionarItem(participanteInput, participantesLista); });
+      addPautaBtn.addEventListener('click', () => adicionarItem(pautaInput, pautasLista));
+      pautaInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionarItem(pautaInput, pautasLista); });
+      gerarAtaBtn.addEventListener('click', () => window.print());
+      [tituloInput, numeroInput, dataInput, localInput, deliberacoesInput, redatorInput].forEach(input => { input.addEventListener('input', atualizarPreview); });
+    });
+  </script>
+</body>
+</html>
